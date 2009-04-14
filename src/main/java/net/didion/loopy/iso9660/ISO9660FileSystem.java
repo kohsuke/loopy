@@ -1,48 +1,54 @@
+/*
+Copyright (C) 2006-2007 loopy project (http://loopy.sourceforge.net)
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 package net.didion.loopy.iso9660;
 
-import net.didion.loopy.FileEntry;
-import net.didion.loopy.LoopyException;
-import net.didion.loopy.impl.AbstractBlockFileSystem;
-import net.didion.loopy.impl.VolumeDescriptor;
+import net.didion.loopy.AbstractBlockFileSystem;
+import net.didion.loopy.VolumeDescriptorSet;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Enumeration;
 
-public class ISO9660FileSystem extends AbstractBlockFileSystem implements Constants {
-    public ISO9660FileSystem(File file, boolean readOnly) throws LoopyException {
-        super(file, readOnly, BLOCK_SIZE, RESERVED_BYTES);
+public class ISO9660FileSystem extends AbstractBlockFileSystem {
+    public ISO9660FileSystem(File file) throws IOException {
+        super(file, true, Constants.DEFAULT_BLOCK_SIZE, Constants.RESERVED_SECTORS);   
     }
 
-    public InputStream getInputStream(FileEntry entry) {
-        ensureOpen();
-        return new EntryInputStream((ISO9660FileEntry) entry, this);
+    public String getEncoding() {
+        return ((ISO9660VolumeDescriptorSet) getVolumeDescriptorSet()).getEncoding();
     }
 
-    protected Enumeration enumerate(FileEntry rootEntry) {
-        return new EntryEnumeration(this, (ISO9660FileEntry) rootEntry);
-    }
-
-    protected VolumeDescriptor createVolumeDescriptor() {
-        return new ISO9660VolumeDescriptor(this);
-    }
-
-    byte[] readData(ISO9660FileEntry entry) throws IOException {
+    byte[] getBytes(ISO9660FileEntry entry) throws IOException {
         int size = entry.getSize();
+
         byte[] buf = new byte[size];
-        readData(entry, 0, buf, 0, size);
+
+        readBytes(entry, 0, buf, 0, size);
+
         return buf;
     }
 
-    int readData(
-            ISO9660FileEntry entry,
-            int entryOffset,
-            byte[] buffer,
-            int bufferOffset,
-            int len)
+    int readBytes(ISO9660FileEntry entry, int entryOffset, byte[] buffer, int bufferOffset, int len)
             throws IOException {
-        long startPos = (entry.getStartBlock() * BLOCK_SIZE) + entryOffset;
+        long startPos = (entry.getStartBlock() * Constants.DEFAULT_BLOCK_SIZE) + entryOffset;
         return readData(startPos, buffer, bufferOffset, len);
+    }
+
+    protected VolumeDescriptorSet createVolumeDescriptorSet() {
+        return new ISO9660VolumeDescriptorSet(this);
     }
 }

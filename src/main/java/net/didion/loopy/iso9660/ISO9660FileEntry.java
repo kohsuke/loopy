@@ -1,71 +1,101 @@
+/*
+Copyright (C) 2006-2007 loopy project (http://loopy.sourceforge.net)
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 package net.didion.loopy.iso9660;
 
-import net.didion.loopy.LoopyException;
-import net.didion.loopy.impl.AbstractBlockFileEntry;
+import net.didion.loopy.FileEntry;
+import net.didion.loopy.util.LittleEndian;
 
+import java.io.InputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.util.LinkedHashMap;
 
-public final class ISO9660FileEntry extends AbstractBlockFileEntry {
-    private ISO9660FileSystem isoFile;
+/**
+ * Represents a file in an ISO9660 file system.
+ */
+public final class ISO9660FileEntry implements FileEntry {
+    public static final char ID_SEPARATOR = ';';
+
+    private ISO9660FileSystem fileSystem;
     private String parentPath;
-    public final int entryLength;
-    public final int extAttributeLength;
-    public final long dataLocation;
-    public final int dataLength;
-    public final int fileUnitSize;
-    public final int interleaveSize;
-    public final long lastModifiedTime;
-    public final int flags;
-    public final String identifier;
-    public final String encoding;
+    private final int entryLength;
+    private final long startSector;
+    private final int dataLength;
+    private final long lastModifiedTime;
+    private final int flags;
+    private final String identifier;
 
-    public ISO9660FileEntry(ISO9660FileSystem isoFile, byte[] buff, int bp, String encoding) {
-        this(isoFile, null, buff, bp, encoding);
+    //private final int extAttributeLength;
+    //private final int fileUnitSize;
+    //private final int interleaveSize;
+
+    public ISO9660FileEntry(final ISO9660FileSystem fileSystem, final byte[] block, final int pos) {
+        this(fileSystem, null, block, pos);
     }
 
     /**
      * Initialize this instance.
-     * @param buff
-     * @param bp
+     * @param fileSystem the parent file system
+     * @param parentPath the path of the parent directory
+     * @param block the bytes of the sector containing this file entry
+     * @param startPos the starting position of this file entry
      */
-    public ISO9660FileEntry(ISO9660FileSystem isoFile, String parentPath, byte[] buff, int bp, String encoding) {
-        this.isoFile = isoFile;
+    public ISO9660FileEntry(final ISO9660FileSystem fileSystem, final String parentPath,
+                            final byte[] block, final int startPos) {
+        this.fileSystem = fileSystem;
         this.parentPath = parentPath;
-        final int offset = bp - 1;
-        this.encoding = encoding;
-        this.entryLength = Util.getUInt8(buff, offset+1);
-        this.extAttributeLength = Util.getUInt8(buff, offset+2);
-        this.dataLocation = Util.getUInt32LE(buff, offset+3);
-        this.dataLength = (int)Util.getUInt32LE(buff, offset+11);
-        this.lastModifiedTime = Util.getIntDate(buff, offset+19);
-        this.flags = Util.getUInt8(buff, offset + 26);
-        this.fileUnitSize = Util.getUInt8(buff, offset+27);
-        this.interleaveSize = Util.getUInt8(buff, offset+28);
-        this.identifier = getFileIdentifier(buff, offset, isDirectory(), encoding);
+
+        final int offset = startPos - 1;
+
+        this.entryLength = Util.getUInt8(block, offset+1);
+        //this.extAttributeLength = Util.getUInt8(block, offset+2);
+        this.startSector = Util.getUInt32LE(block, offset+3);
+        this.dataLength = (int) Util.getUInt32LE(block, offset+11);
+        this.lastModifiedTime = Util.getDateTime(block, offset+19);
+        this.flags = Util.getUInt8(block, offset + 26);
+        //this.fileUnitSize = Util.getUInt8(block, offset+27);
+        //this.interleaveSize = Util.getUInt8(block, offset+28);
+        this.identifier = getFileIdentifier(block, offset, isDirectory());
     }
 
-    private final String getFileIdentifier(
-            byte[] buff, int offset, boolean isDir, String encoding) {
-        final int fidLength = Util.getUInt8(buff, offset+33);
+    private String getFileIdentifier(final byte[] block, final int offset, final boolean isDir) {
+        final int fidLength = Util.getUInt8(block, offset+33);
+
         if (isDir) {
-            final int buff34 = Util.getUInt8(buff, offset+34);
+            final int buff34 = Util.getUInt8(block, offset+34);
+
             if ((fidLength == 1) && (buff34 == 0x00)) {
                 return ".";
-            } else if ((fidLength == 1) && (buff34 == 0x01)) {
+            }
+            else if ((fidLength == 1) && (buff34 == 0x01)) {
                 return "..";
             }
         }
-        try {
-            final String id = Util.getDChars(buff, offset+34, fidLength, encoding);
-            final int sep2Idx = id.indexOf(Constants.SEPARATOR2);
-            if (sep2Idx >= 0) {
-                return id.substring(0, sep2Idx);
-            } else {
-                return id;
-            }
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException(ex);
+
+        final String id = Util.getDChars(
+                block, offset+34, fidLength, this.fileSystem.getEncoding());
+
+        final int sepIdx = id.indexOf(ID_SEPARATOR);
+
+        if (sepIdx >= 0) {
+            return id.substring(0, sepIdx);
+        }
+        else {
+            return id;
         }
     }
 
@@ -77,18 +107,23 @@ public final class ISO9660FileEntry extends AbstractBlockFileEntry {
         if (".".equals(this.getName())) {
             return "";
         }
+
         StringBuffer buf = new StringBuffer();
+
         if (null != this.parentPath) {
             buf.append(this.parentPath);
         }
+
         buf.append(getName());
+
         if (isDirectory()) {
             buf.append("/");
         }
+
         return buf.toString();
     }
 
-    public long getLastModified() {
+    public long getLastModifiedTime() {
         return this.lastModifiedTime;
     }
 
@@ -100,27 +135,85 @@ public final class ISO9660FileEntry extends AbstractBlockFileEntry {
         return this.dataLength;
     }
 
+    /**
+     * Returns the block number where this entry starts.
+     *
+     * @return
+     */
     public long getStartBlock() {
-        return this.dataLocation;
+        return this.startSector;
     }
 
-    public final boolean isLastEntry() {
-        return (this.flags & 0x40) == 0;
-    }
-
-    public String getEncoding() {
-        return this.encoding;
-    }
-
+    /**
+     * Returns the size this entry takes up in the file table.
+     *
+     * @return
+     */
     public int getEntryLength() {
         return this.entryLength;
     }
 
-    public byte[] getFileData() throws LoopyException {
-        try {
-            return this.isoFile.readData(this);
-        } catch (IOException ex) {
-            throw new LoopyException("Error reading data for entry: " + this, ex);
+    /**
+     * Returns true if this is the last entry in the file system.
+     *
+     * @return
+     */
+    public final boolean isLastEntry() {
+        return (this.flags & 0x40) == 0;
+    }
+
+    public InputStream read() {
+        return new EntryInputStream(this, fileSystem);
+    }
+
+    public LinkedHashMap<String,FileEntry> childEntries() throws IOException {
+        LinkedHashMap<String,FileEntry> children = new LinkedHashMap<String, FileEntry>();
+
+        if(!isDirectory())
+            return children;
+
+        final byte[] content = this.fileSystem.getBytes(this);
+
+        int offset = 0;
+        boolean paddingMode = false;
+
+        while (offset < content.length) {
+            if (LittleEndian.getUInt8(content, offset) <= 0) {
+                paddingMode = true;
+                offset += 2;
+                continue;
+            }
+
+            ISO9660FileEntry child = new ISO9660FileEntry(
+                    this.fileSystem, getPath(), content, offset+1);
+
+            if (paddingMode && child.getSize() < 0) {
+                continue;
+            }
+
+            offset += child.getEntryLength();
+
+            children.put(child.getName(),child);
         }
+
+        return children;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ISO9660FileEntry that = (ISO9660FileEntry) o;
+        return fileSystem.equals(that.fileSystem) && identifier.equals(that.identifier) && parentPath.equals(that.parentPath);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = fileSystem.hashCode();
+        result = 31 * result + parentPath.hashCode();
+        result = 31 * result + identifier.hashCode();
+        return result;
     }
 }

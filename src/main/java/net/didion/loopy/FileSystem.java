@@ -1,33 +1,45 @@
+/*
+Copyright (C) 2006-2007 loopy project (http://loopy.sourceforge.net)
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 package net.didion.loopy;
 
-import java.util.Enumeration;
-import java.io.InputStream;
+import java.io.IOException;
 
+/**
+ * A loopy file system, which is deserialize-only and consists of zero or more entries.
+ */
 public interface FileSystem {
     /**
-     * Get an enumeration of the entries within this file system.
-     * @return an enumeration of the entries within this file system.
+     * Returns the directory that represents the root of the file system.
      */
-    Enumeration getEntries();
+    FileEntry getRootEntry();
 
     /**
-     * Get an input stream that reads the data for the given entry.
-     * @param entry
-     * @return an input stream that reads the contents of the given entry.
+     * Closes this file system. This automatically closes all input streams opened via
+     * {@link FileEntry#read()}.
+     *
+     * @throws IOException if there was an error closing the FileSystem.
      */
-    InputStream getInputStream(FileEntry entry);
-
-    /**
-     * Close the file system. This automatically closes all input streams
-     * opened via {@link FileSystem#getInputStream(FileEntry entry)}.
-     * @throws LoopyException if there was an error closing the FileSystem.
-     */
-    void close() throws LoopyException;
+    void close() throws IOException;
 
     /**
      * Returns whether or not this FileSystem has been closed.
-     * @return true if {@link FileSystem#close()} has been called on this
-     * FileSystem, otherwise false.
+     *
+     * @return true if {@link FileSystem#close()} has been called on this * FileSystem, otherwise false.
      */
     boolean isClosed();
 }

@@ -13,7 +13,6 @@
   <groupId>org.kohsuke.loopy</groupId>
   <artifactId>loopy</artifactId>
   <version>0.4-SNAPSHOT</version>
-  <packaging>pom</packaging>
 
   <scm>
     <connection>scm:git:git://github.com/kohsuke/loopy.git</connection>

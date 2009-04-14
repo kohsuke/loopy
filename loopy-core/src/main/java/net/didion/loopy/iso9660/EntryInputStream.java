@@ -76,6 +76,7 @@ class EntryInputStream extends InputStream {
 
         if (this.rem == 0) {
             close();
+            read = -1; // EOF
         }
 
         return read;

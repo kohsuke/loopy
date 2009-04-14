@@ -76,4 +76,17 @@ public interface FileEntry {
      *      Never null. Ordered as listed in the the directory entry.
      */
     LinkedHashMap<String,FileEntry> childEntries() throws IOException;
+
+    /**
+     * Gets a {@link FileEntry} by a path. This is more convenient than calling
+     * {@link #childEntries()} multiple times.
+     *
+     * @param path
+     *      If this starts with '/', like '/foo/bar.txt', it's interpreted from the top of the file system.
+     *      Otherwise, it's interpreted as relative to this directory, like "foo/bar.txt" or "../some.jar"
+     *
+     * @return
+     *      null if no such entry exists.
+     */
+    FileEntry get(String path) throws IOException;
 }

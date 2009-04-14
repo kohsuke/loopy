@@ -199,6 +199,27 @@ public final class ISO9660FileEntry implements FileEntry {
         return children;
     }
 
+    public FileEntry get(String path) throws IOException {
+        FileEntry cur=this;
+        while(cur!=null) {
+            if(path.length()==0)
+                return cur;
+            if(path.startsWith("/")) {
+                path = path.substring(1);
+                cur=fileSystem.getRootEntry();
+                continue;
+            }
+
+            int idx = path.indexOf('/');
+            if(idx<0)
+                return cur.childEntries().get(path);
+
+            cur=cur.childEntries().get(path.substring(0,idx));
+            path = path.substring(idx+1);
+        }
+        return null; // not found
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

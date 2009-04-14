@@ -29,6 +29,11 @@ public interface FileSystem {
     FileEntry getRootEntry();
 
     /**
+     * Short for {@code getRootEntry().get(path)}.
+     */
+    FileEntry get(String path) throws IOException;
+
+    /**
      * Closes this file system. This automatically closes all input streams opened via
      * {@link FileEntry#read()}.
      *

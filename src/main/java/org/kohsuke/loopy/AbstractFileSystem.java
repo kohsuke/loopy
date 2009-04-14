@@ -45,6 +45,10 @@ public abstract class AbstractFileSystem implements FileSystem {
         this.channel = new RandomAccessFile(file, "r");
     }
 
+    public FileEntry get(String path) throws IOException {
+        return getRootEntry().get(path);
+    }
+
     // TODO: close open streams automatically
     public synchronized void close() throws IOException {
         if (isClosed()) {

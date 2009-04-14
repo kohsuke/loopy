@@ -35,11 +35,6 @@ public class ISO9660FileSystem extends AbstractBlockFileSystem {
         return ((ISO9660VolumeDescriptorSet) getVolumeDescriptorSet()).getEncoding();
     }
 
-    public InputStream getInputStream(FileEntry entry) {
-        ensureOpen();
-        return new EntryInputStream((ISO9660FileEntry) entry, this);
-    }
-
     byte[] getBytes(ISO9660FileEntry entry) throws IOException {
         int size = entry.getSize();
 
@@ -54,10 +49,6 @@ public class ISO9660FileSystem extends AbstractBlockFileSystem {
             throws IOException {
         long startPos = (entry.getStartBlock() * Constants.DEFAULT_BLOCK_SIZE) + entryOffset;
         return readData(startPos, buffer, bufferOffset, len);
-    }
-
-    protected Enumeration enumerate(FileEntry rootEntry) {
-        return new EntryEnumeration(this, (ISO9660FileEntry) rootEntry);
     }
 
     protected VolumeDescriptorSet createVolumeDescriptorSet() {

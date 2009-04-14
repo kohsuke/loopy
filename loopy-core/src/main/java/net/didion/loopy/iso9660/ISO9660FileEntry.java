@@ -18,6 +18,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 package net.didion.loopy.iso9660;
 
 import net.didion.loopy.FileEntry;
+import net.didion.loopy.util.LittleEndian;
+
+import java.io.InputStream;
+import java.io.IOException;
+import java.util.LinkedHashMap;
 
 /**
  * Represents a file in an ISO9660 file system.
@@ -155,5 +160,42 @@ public final class ISO9660FileEntry implements FileEntry {
      */
     public final boolean isLastEntry() {
         return (this.flags & 0x40) == 0;
+    }
+
+    public InputStream read() {
+        return new EntryInputStream(this, fileSystem);
+    }
+
+    public LinkedHashMap<String,FileEntry> childEntries() throws IOException {
+        LinkedHashMap<String,FileEntry> children = new LinkedHashMap<String, FileEntry>();
+
+        if(!isDirectory())
+            return children;
+
+        final byte[] content = this.fileSystem.getBytes(this);
+
+        int offset = 0;
+        boolean paddingMode = false;
+
+        while (offset < content.length) {
+            if (LittleEndian.getUInt8(content, offset) <= 0) {
+                paddingMode = true;
+                offset += 2;
+                continue;
+            }
+
+            ISO9660FileEntry child = new ISO9660FileEntry(
+                    this.fileSystem, getPath(), content, offset+1);
+
+            if (paddingMode && child.getSize() < 0) {
+                continue;
+            }
+
+            offset += child.getEntryLength();
+
+            children.put(child.getName(),child);
+        }
+
+        return children;
     }
 }

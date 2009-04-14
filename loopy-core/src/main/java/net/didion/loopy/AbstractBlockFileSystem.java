@@ -46,7 +46,7 @@ public abstract class AbstractBlockFileSystem extends AbstractFileSystem {
         this.reservedBlocks = reservedBlocks;
     }
 
-    public Enumeration getEntries() {
+    public FileEntry getRootEntry() {
         ensureOpen();
 
         // load the volume descriptors if necessary
@@ -59,7 +59,7 @@ public abstract class AbstractBlockFileSystem extends AbstractFileSystem {
             }
         }
 
-        return enumerate(this.volumeDescriptorSet.getRootEntry());
+        return this.volumeDescriptorSet.getRootEntry();
     }
 
     protected void loadVolumeDescriptors() throws IOException {
@@ -117,14 +117,6 @@ public abstract class AbstractBlockFileSystem extends AbstractFileSystem {
     protected VolumeDescriptorSet getVolumeDescriptorSet() {
         return this.volumeDescriptorSet;
     }
-
-    /**
-     * Returns an enumeration of the file entries starting at <code>root</code>.
-     *
-     * @param root
-     * @return
-     */
-    protected abstract Enumeration enumerate(FileEntry root);
 
     /**
      * Creates the VolumeDescriptorSet that deserializes volume descriptors for this file system.

@@ -17,6 +17,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 package net.didion.loopy;
 
+import java.io.InputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
 /**
  * An entry in a loopy file system. Paths within the file system are unix-like ("/" separated
  * hierarchy of folders and files).
@@ -56,4 +62,20 @@ public interface FileEntry {
      * @return the entry size
      */
     int getSize();
+
+    /**
+     * Returns an input stream that reads the data for the given entry.
+     *
+     * @return an input stream that reads the contents of the given entry
+     */
+    InputStream read();
+
+    /**
+     * If this is a directory, returns all the children, including sub-directories and files,
+     * as well as "." and "..".
+     *
+     * @return
+     *      Never null. Ordered as listed in the the directory entry.
+     */
+    LinkedHashMap<String,FileEntry> childEntries() throws IOException;
 }

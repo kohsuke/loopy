@@ -31,10 +31,12 @@ public class LoopyException extends IOException {
     }
 
     public LoopyException(final Throwable cause) {
-        super(cause);
+        super(cause.getMessage());
+        initCause(cause);
     }
 
     public LoopyException(final String message, final Throwable cause) {
-        super(message, cause);
+        super(message);
+        initCause(cause);
     }
 }

@@ -17,33 +17,20 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 package net.didion.loopy;
 
-import java.util.Enumeration;
-import java.io.InputStream;
 import java.io.IOException;
 
 /**
- * A loopy file system, which is deserialize-only and consists of zero or more entries. The data
- * for each entry can be retrieved using {@link #getInputStream(FileEntry)}.
+ * A loopy file system, which is deserialize-only and consists of zero or more entries.
  */
 public interface FileSystem {
     /**
-     * Returns an enumeration of the entries within this file system.
-     *
-     * @return an enumeration of the entries within this file system
+     * Returns the directory that represents the root of the file system.
      */
-    Enumeration getEntries();
-
-    /**
-     * Returns an input stream that reads the data for the given entry.
-     *
-     * @param entry the FileEntry
-     * @return an input stream that reads the contents of the given entry
-     */
-    InputStream getInputStream(FileEntry entry);
+    FileEntry getRootEntry();
 
     /**
      * Closes this file system. This automatically closes all input streams opened via
-     * {@link FileSystem#getInputStream(FileEntry entry)}.
+     * {@link FileEntry#read()}.
      *
      * @throws IOException if there was an error closing the FileSystem.
      */

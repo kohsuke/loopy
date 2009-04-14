@@ -24,7 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-public final class Util {
+final class Util {
     /**
      * Gets an unsigned 8-bit value LSB first. See section 7.1.1.
      *

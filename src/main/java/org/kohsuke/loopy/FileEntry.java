@@ -55,6 +55,11 @@ public interface FileEntry {
     boolean isDirectory();
 
     /**
+     * If this file entry represents a symlink, return its target. Otherwise null.
+     */
+    String getSymLinkTarget();
+
+    /**
      * Returns the size, in bytes, of the data represented by this entry.
      *
      * @return the entry size

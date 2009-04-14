@@ -18,11 +18,16 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 package org.kohsuke.loopy.iso9660;
 
 import org.kohsuke.loopy.FileEntry;
+import org.kohsuke.loopy.rr.RockRidge;
+import org.kohsuke.loopy.rr.NMRecord;
+import org.kohsuke.loopy.rr.SLRecord;
 import org.kohsuke.loopy.util.LittleEndian;
 
 import java.io.InputStream;
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Collections;
 
 /**
  * Represents a file in an ISO9660 file system.
@@ -45,7 +50,13 @@ public final class ISO9660FileEntry implements FileEntry {
     //private final int fileUnitSize;
     //private final int interleaveSize;
 
-    public ISO9660FileEntry(final ISO9660FileSystem fileSystem, final byte[] block, final int pos) {
+    /**
+     * If this file entry has RR extensions, load them here.
+     */
+    private final List<RockRidge> rr;
+
+
+    public ISO9660FileEntry(final ISO9660FileSystem fileSystem, final byte[] block, final int pos) throws IOException {
         this(fileSystem, null, block, pos);
     }
 
@@ -57,7 +68,7 @@ public final class ISO9660FileEntry implements FileEntry {
      * @param startPos the starting position of this file entry
      */
     public ISO9660FileEntry(final ISO9660FileSystem fileSystem, final String parentPath,
-                            final byte[] block, final int startPos) {
+                            final byte[] block, final int startPos) throws IOException {
         this.fileSystem = fileSystem;
         this.parentPath = parentPath;
 
@@ -74,8 +85,14 @@ public final class ISO9660FileEntry implements FileEntry {
         this.identifier = getFileIdentifier(block, offset, isDirectory());
 
         int header = padToEven(33+Util.getUInt8(block,offset+33));
-        systemUse = new byte[entryLength-header];
-        System.arraycopy(block,offset+header,systemUse,0,systemUse.length);
+        if(entryLength==header) {
+            systemUse = EMPTY_ARRAY;
+            rr = Collections.emptyList();
+        } else {
+            systemUse = new byte[entryLength-header];
+            System.arraycopy(block,offset+header,systemUse,0,systemUse.length);
+            rr = RockRidge.parse(systemUse);
+        }
     }
 
     private int padToEven(int len) {
@@ -111,6 +128,8 @@ public final class ISO9660FileEntry implements FileEntry {
     }
 
     public String getName() {
+        NMRecord nm = getRockRidgeExtension(NMRecord.class);
+        if(nm!=null)    return nm.name;
         return this.identifier;
     }
 
@@ -140,6 +159,12 @@ public final class ISO9660FileEntry implements FileEntry {
 
     public boolean isDirectory() {
         return (this.flags & 0x03) != 0;
+    }
+
+    public String getSymLinkTarget() {
+        SLRecord r = getRockRidgeExtension(SLRecord.class);
+        if(r!=null) return r.name;
+        return null;
     }
 
     public int getSize() {
@@ -235,6 +260,13 @@ public final class ISO9660FileEntry implements FileEntry {
         return systemUse;
     }
 
+    public <T extends RockRidge> T getRockRidgeExtension(Class<T> type) {
+        for (RockRidge r : rr)
+            if(r.getClass()==type)
+                return type.cast(r);
+        return null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -256,4 +288,6 @@ public final class ISO9660FileEntry implements FileEntry {
         result = 31 * result + identifier.hashCode();
         return result;
     }
+
+    private static final byte[] EMPTY_ARRAY = new byte[0];
 }

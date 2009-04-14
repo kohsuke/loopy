@@ -38,6 +38,7 @@ public final class ISO9660FileEntry implements FileEntry {
     private final long lastModifiedTime;
     private final int flags;
     private final String identifier;
+    private final byte[] systemUse;
 
     //private final int extAttributeLength;
     //private final int fileUnitSize;
@@ -70,6 +71,10 @@ public final class ISO9660FileEntry implements FileEntry {
         //this.fileUnitSize = Util.getUInt8(block, offset+27);
         //this.interleaveSize = Util.getUInt8(block, offset+28);
         this.identifier = getFileIdentifier(block, offset, isDirectory());
+
+        int header = 33+Util.getUInt8(block,offset+33);
+        systemUse = new byte[entryLength-header];
+        System.arraycopy(block,startPos+header,systemUse,0,systemUse.length);
     }
 
     private String getFileIdentifier(final byte[] block, final int offset, final boolean isDir) {
@@ -218,6 +223,10 @@ public final class ISO9660FileEntry implements FileEntry {
             path = path.substring(idx+1);
         }
         return null; // not found
+    }
+
+    public byte[] getSystemUse() {
+        return systemUse;
     }
 
     @Override

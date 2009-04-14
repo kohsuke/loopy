@@ -17,18 +17,15 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 package net.didion.loopy.iso9660;
 
-import net.didion.loopy.FileEntry;
 import net.didion.loopy.AbstractBlockFileSystem;
 import net.didion.loopy.VolumeDescriptorSet;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Enumeration;
 
 public class ISO9660FileSystem extends AbstractBlockFileSystem {
-    public ISO9660FileSystem(File file, boolean readOnly) throws IOException {
-        super(file, readOnly, Constants.DEFAULT_BLOCK_SIZE, Constants.RESERVED_SECTORS);   
+    public ISO9660FileSystem(File file) throws IOException {
+        super(file, true, Constants.DEFAULT_BLOCK_SIZE, Constants.RESERVED_SECTORS);   
     }
 
     public String getEncoding() {

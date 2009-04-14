@@ -15,11 +15,10 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package net.didion.loopy;
+package org.kohsuke.loopy;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Enumeration;
 
 /**
  * A block file system is segmented into multiple fixed-size blocks. It consists of a set of volume

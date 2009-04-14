@@ -15,28 +15,29 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package net.didion.loopy;
+package org.kohsuke.loopy;
+
+import org.kohsuke.loopy.FileEntry;
 
 import java.io.IOException;
 
 /**
- * General loopy exception.
+ * Contains all the volume descriptors for a block file system.
  */
-public class LoopyException extends IOException {
-    public LoopyException() {
-    }
+public interface VolumeDescriptorSet {
+    /**
+     * Load a volume descriptor from the specified byte array.
+     *
+     * @param volumeDescriptor the volume descriptor to deserialize
+     * @return true if the volume descriptor is a terminator
+     * @throws IOException if there is an error deserializing the volume descriptor
+     */
+    boolean deserialize(byte[] volumeDescriptor) throws IOException;
 
-    public LoopyException(final String message) {
-        super(message);
-    }
-
-    public LoopyException(final Throwable cause) {
-        super(cause.getMessage());
-        initCause(cause);
-    }
-
-    public LoopyException(final String message, final Throwable cause) {
-        super(message);
-        initCause(cause);
-    }
+    /**
+     * Returns the root file entry for the file system.
+     *
+     * @return the root file entry for the file system
+     */
+    FileEntry getRootEntry();
 }

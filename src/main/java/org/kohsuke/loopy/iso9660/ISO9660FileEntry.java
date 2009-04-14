@@ -15,10 +15,10 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package net.didion.loopy.iso9660;
+package org.kohsuke.loopy.iso9660;
 
-import net.didion.loopy.FileEntry;
-import net.didion.loopy.util.LittleEndian;
+import org.kohsuke.loopy.FileEntry;
+import org.kohsuke.loopy.util.LittleEndian;
 
 import java.io.InputStream;
 import java.io.IOException;

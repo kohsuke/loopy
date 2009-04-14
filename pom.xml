@@ -10,15 +10,10 @@
   example. loopy is being developed for use by Apache Jakarta Commons VFS.
   </description>
 
-  <groupId>net.didion.loopy</groupId>
+  <groupId>org.kohsuke.loopy</groupId>
   <artifactId>loopy</artifactId>
-  <version>0.3</version>
+  <version>0.4-SNAPSHOT</version>
   <packaging>pom</packaging>
-
-  <modules>
-    <module>loopy-core</module>
-    <!--module>loopy-vfs</module-->
-  </modules>
 
   <developers>
     <developer>
@@ -46,32 +41,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>commons-logging</groupId>
-        <artifactId>commons-logging</artifactId>
-        <version>1.0.4</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>commons-vfs</groupId>
-        <artifactId>commons-vfs</artifactId>
-        <version>1.0</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>net.didion.loopy</groupId>
-        <artifactId>loopy-core</artifactId>
-        <version>${version}</version>
-      </dependency>
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>3.8.2</version>
-        <scope>test</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 </project>

@@ -15,29 +15,28 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package net.didion.loopy;
+package org.kohsuke.loopy.iso9660;
 
-import net.didion.loopy.FileEntry;
 
-import java.io.IOException;
-
-/**
- * Contains all the volume descriptors for a block file system.
- */
-public interface VolumeDescriptorSet {
+public interface Constants {
     /**
-     * Load a volume descriptor from the specified byte array.
-     *
-     * @param volumeDescriptor the volume descriptor to deserialize
-     * @return true if the volume descriptor is a terminator
-     * @throws IOException if there is an error deserializing the volume descriptor
+     * ISO sector size. This does not include the 288 bytes reserved for synchronization, header, and EC on
+     * CD-ROMs because this information is not used in .iso files.
      */
-    boolean deserialize(byte[] volumeDescriptor) throws IOException;
+    int DEFAULT_BLOCK_SIZE = 2 * 1024;
 
     /**
-     * Returns the root file entry for the file system.
-     *
-     * @return the root file entry for the file system
+     * The number of reserved sectors at the beginning of the file.
      */
-    FileEntry getRootEntry();
+    int RESERVED_SECTORS = 16;
+
+    /**
+     * The number of reserved bytes at the beginning of the file.
+     */
+    int RESERVED_BYTES = RESERVED_SECTORS * DEFAULT_BLOCK_SIZE;
+
+    /**
+     * Default character encoding.
+     */
+    String DEFAULT_ENCODING = "US-ASCII";
 }

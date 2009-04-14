@@ -15,28 +15,31 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-package net.didion.loopy.iso9660;
+package org.kohsuke.loopy;
 
+import java.io.IOException;
 
-public interface Constants {
+/**
+ * A loopy file system, which is deserialize-only and consists of zero or more entries.
+ */
+public interface FileSystem {
     /**
-     * ISO sector size. This does not include the 288 bytes reserved for synchronization, header, and EC on
-     * CD-ROMs because this information is not used in .iso files.
+     * Returns the directory that represents the root of the file system.
      */
-    int DEFAULT_BLOCK_SIZE = 2 * 1024;
-
-    /**
-     * The number of reserved sectors at the beginning of the file.
-     */
-    int RESERVED_SECTORS = 16;
+    FileEntry getRootEntry();
 
     /**
-     * The number of reserved bytes at the beginning of the file.
+     * Closes this file system. This automatically closes all input streams opened via
+     * {@link FileEntry#read()}.
+     *
+     * @throws IOException if there was an error closing the FileSystem.
      */
-    int RESERVED_BYTES = RESERVED_SECTORS * DEFAULT_BLOCK_SIZE;
+    void close() throws IOException;
 
     /**
-     * Default character encoding.
+     * Returns whether or not this FileSystem has been closed.
+     *
+     * @return true if {@link FileSystem#close()} has been called on this * FileSystem, otherwise false.
      */
-    String DEFAULT_ENCODING = "US-ASCII";
+    boolean isClosed();
 }

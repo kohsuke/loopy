@@ -17,7 +17,7 @@
 
   <modules>
     <module>loopy-core</module>
-    <module>loopy-vfs</module>
+    <!--module>loopy-vfs</module-->
   </modules>
 
   <developers>
@@ -34,6 +34,18 @@
       <url>http://www.gnu.org/copyleft/lesser.txt</url>
     </license>
   </licenses>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
   <dependencyManagement>
     <dependencies>

@@ -198,4 +198,22 @@ public final class ISO9660FileEntry implements FileEntry {
 
         return children;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ISO9660FileEntry that = (ISO9660FileEntry) o;
+        return fileSystem.equals(that.fileSystem) && identifier.equals(that.identifier) && parentPath.equals(that.parentPath);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = fileSystem.hashCode();
+        result = 31 * result + parentPath.hashCode();
+        result = 31 * result + identifier.hashCode();
+        return result;
+    }
 }

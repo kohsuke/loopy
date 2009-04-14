@@ -45,17 +45,12 @@ public abstract class AbstractBlockFileSystem extends AbstractFileSystem {
         this.reservedBlocks = reservedBlocks;
     }
 
-    public FileEntry getRootEntry() {
+    public FileEntry getRootEntry() throws IOException {
         ensureOpen();
 
         // load the volume descriptors if necessary
         if (null == this.volumeDescriptorSet) {
-            try {
-                loadVolumeDescriptors();
-            }
-            catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+            loadVolumeDescriptors();
         }
 
         return this.volumeDescriptorSet.getRootEntry();

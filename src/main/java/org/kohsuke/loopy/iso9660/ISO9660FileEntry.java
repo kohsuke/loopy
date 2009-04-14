@@ -39,6 +39,7 @@ public final class ISO9660FileEntry implements FileEntry {
     private final int flags;
     private final String identifier;
     private final byte[] systemUse;
+    public final int extAttributeLength;
 
     //private final int extAttributeLength;
     //private final int fileUnitSize;
@@ -63,7 +64,7 @@ public final class ISO9660FileEntry implements FileEntry {
         final int offset = startPos - 1;
 
         this.entryLength = Util.getUInt8(block, offset+1);
-        //this.extAttributeLength = Util.getUInt8(block, offset+2);
+        this.extAttributeLength = Util.getUInt8(block, offset+2);
         this.startSector = Util.getUInt32LE(block, offset+3);
         this.dataLength = (int) Util.getUInt32LE(block, offset+11);
         this.lastModifiedTime = Util.getDateTime(block, offset+19);
@@ -72,9 +73,14 @@ public final class ISO9660FileEntry implements FileEntry {
         //this.interleaveSize = Util.getUInt8(block, offset+28);
         this.identifier = getFileIdentifier(block, offset, isDirectory());
 
-        int header = 33+Util.getUInt8(block,offset+33);
+        int header = padToEven(33+Util.getUInt8(block,offset+33));
         systemUse = new byte[entryLength-header];
-        System.arraycopy(block,startPos+header,systemUse,0,systemUse.length);
+        System.arraycopy(block,offset+header,systemUse,0,systemUse.length);
+    }
+
+    private int padToEven(int len) {
+        if(len%2==0)    return len;
+        return len+1;
     }
 
     private String getFileIdentifier(final byte[] block, final int offset, final boolean isDir) {
@@ -235,14 +241,18 @@ public final class ISO9660FileEntry implements FileEntry {
         if (o == null || getClass() != o.getClass()) return false;
 
         ISO9660FileEntry that = (ISO9660FileEntry) o;
-        return fileSystem.equals(that.fileSystem) && identifier.equals(that.identifier) && parentPath.equals(that.parentPath);
 
+        if (!fileSystem.equals(that.fileSystem)) return false;
+        if (!identifier.equals(that.identifier)) return false;
+        if (parentPath != null ? !parentPath.equals(that.parentPath) : that.parentPath != null) return false;
+
+        return true;
     }
 
     @Override
     public int hashCode() {
         int result = fileSystem.hashCode();
-        result = 31 * result + parentPath.hashCode();
+        result = 31 * result + (parentPath != null ? parentPath.hashCode() : 0);
         result = 31 * result + identifier.hashCode();
         return result;
     }

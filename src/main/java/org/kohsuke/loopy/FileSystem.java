@@ -26,7 +26,7 @@ public interface FileSystem {
     /**
      * Returns the directory that represents the root of the file system.
      */
-    FileEntry getRootEntry();
+    FileEntry getRootEntry() throws IOException;
 
     /**
      * Short for {@code getRootEntry().get(path)}.

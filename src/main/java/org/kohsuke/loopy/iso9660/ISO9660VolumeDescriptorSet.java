@@ -200,7 +200,7 @@ public class ISO9660VolumeDescriptorSet implements VolumeDescriptorSet {
      */
     private void deserializeSupplementary(byte[] descriptor) throws IOException {
         // for now, only recognize one supplementary descriptor
-        if (this.hasSupplementary) {
+        if (this.hasSupplementary || !isoFile.readJoliet) {
             return;
         }
 

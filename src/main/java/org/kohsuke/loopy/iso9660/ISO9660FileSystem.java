@@ -24,8 +24,16 @@ import java.io.File;
 import java.io.IOException;
 
 public class ISO9660FileSystem extends AbstractBlockFileSystem {
-    public ISO9660FileSystem(File file) throws IOException {
-        super(file, true, Constants.DEFAULT_BLOCK_SIZE, Constants.RESERVED_SECTORS);   
+    final boolean readJoliet;
+
+    /**
+     * @param readJoliet
+     *      True to read supplementary volume descriptors. AFAIK, only Joliet uses it,
+     *      so this is equivalent to prefer joliet (and ignore rock ridge extensions.)
+     */
+    public ISO9660FileSystem(File file, boolean readJoliet) throws IOException {
+        super(file, true, Constants.DEFAULT_BLOCK_SIZE, Constants.RESERVED_SECTORS);
+        this.readJoliet = readJoliet;
     }
 
     public String getEncoding() {

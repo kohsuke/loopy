@@ -17,14 +17,12 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 package net.didion.loopy.iso9660;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import net.didion.loopy.VolumeDescriptorSet;
 import net.didion.loopy.FileEntry;
 import net.didion.loopy.LoopyException;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * Layout of Primary Volume Descriptor:
@@ -74,7 +72,7 @@ public class ISO9660VolumeDescriptorSet implements VolumeDescriptorSet {
     public static final int TYPE_PARTITION_DESCRIPTOR = 3;
     public static final int TYPE_TERMINATOR = 255;
 
-    private static final Log log = LogFactory.getLog(ISO9660VolumeDescriptorSet.class);
+    private static final Logger LOGGER = Logger.getLogger(ISO9660VolumeDescriptorSet.class.getName());
 
     private final ISO9660FileSystem isoFile;
 
@@ -131,21 +129,21 @@ public class ISO9660VolumeDescriptorSet implements VolumeDescriptorSet {
                 terminator = true;
                 break;
             case TYPE_BOOTRECORD:
-                log.debug("Found boot record");
+                LOGGER.fine("Found boot record");
                 break;
             case TYPE_PRIMARY_DESCRIPTOR:
-                log.debug("Found primary descriptor");
+                LOGGER.fine("Found primary descriptor");
                 deserializePrimary(descriptor);
                 break;
             case TYPE_SUPPLEMENTARY_DESCRIPTOR:
-                log.debug("Found supplementatory descriptor");
+                LOGGER.fine("Found supplementatory descriptor");
                 deserializeSupplementary(descriptor);
                 break;
             case TYPE_PARTITION_DESCRIPTOR:
-                log.debug("Found partition descriptor");
+                LOGGER.fine("Found partition descriptor");
                 break;
             default:
-                log.debug("Found unknown descriptor with type " + type);
+                LOGGER.fine("Found unknown descriptor with type " + type);
         }
 
         return terminator;
@@ -221,7 +219,7 @@ public class ISO9660VolumeDescriptorSet implements VolumeDescriptorSet {
             this.hasSupplementary = true;
         }
         else {
-            log.warn("Unsupported encoding, escapeSequences: '" + this.escapeSequences + "'");
+            LOGGER.fine("Unsupported encoding, escapeSequences: '" + this.escapeSequences + "'");
         }
     }
 

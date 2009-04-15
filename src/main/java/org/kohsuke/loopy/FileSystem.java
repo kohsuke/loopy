@@ -18,6 +18,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 package org.kohsuke.loopy;
 
 import java.io.IOException;
+import java.io.File;
 
 /**
  * A loopy file system, which is deserialize-only and consists of zero or more entries.

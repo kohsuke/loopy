@@ -31,6 +31,8 @@ public abstract class AbstractFileSystem implements FileSystem {
      */
     private RandomAccessFile channel;
 
+    private final File file;
+
     protected AbstractFileSystem(final File file, final boolean readOnly) throws IOException {
         if (!readOnly) {
             throw new IllegalArgumentException("Currrently, only read-only is supported");
@@ -43,6 +45,14 @@ public abstract class AbstractFileSystem implements FileSystem {
 
         // open the channel
         this.channel = new RandomAccessFile(file, "r");
+        this.file = file;
+    }
+
+    /**
+     * Gets the ISO file that this file system is in.
+     */
+    public File getIsoFile() {
+        return file;
     }
 
     public FileEntry get(String path) throws IOException {

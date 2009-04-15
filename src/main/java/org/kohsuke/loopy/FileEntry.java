@@ -94,4 +94,10 @@ public interface FileEntry {
      *      null if no such entry exists.
      */
     FileEntry get(String path) throws IOException;
+
+    /**
+     * Works like {@link #get(String)} except that if the path is not found, throw an IOException
+     * instead of returning null.
+     */
+    FileEntry grab(String path) throws IOException;
 }

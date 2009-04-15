@@ -256,6 +256,12 @@ public final class ISO9660FileEntry implements FileEntry {
         return null; // not found
     }
 
+    public FileEntry grab(String path) throws IOException {
+        FileEntry e = get(path);
+        if(e==null) throw new IOException(path+" not found in "+getPath()+" on "+fileSystem.getIsoFile());
+        return e;
+    }
+
     public byte[] getSystemUse() {
         return systemUse;
     }

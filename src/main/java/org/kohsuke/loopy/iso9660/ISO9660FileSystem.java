@@ -29,7 +29,8 @@ public class ISO9660FileSystem extends AbstractBlockFileSystem {
     /**
      * @param readJoliet
      *      True to read supplementary volume descriptors. AFAIK, only Joliet uses it,
-     *      so this is equivalent to prefer joliet (and ignore rock ridge extensions.)
+     *      so this is equivalent to prefer joliet (and ignore rock ridge extensions,
+     *      which means all the POSIX like information will be lost.)
      */
     public ISO9660FileSystem(File file, boolean readJoliet) throws IOException {
         super(file, true, Constants.DEFAULT_BLOCK_SIZE, Constants.RESERVED_SECTORS);

@@ -43,7 +43,7 @@ class EntryInputStream extends InputStream {
         this.rem = entry.getSize();
     }
 
-    public int read(final byte b[], final int off, final int len) throws IOException {
+    public int read(final byte b[], final int off, int len) throws IOException {
         ensureOpen();
 
         if (this.rem == 0) {
@@ -53,10 +53,8 @@ class EntryInputStream extends InputStream {
             return 0;
         }
 
-        int toRead = len;
-
-        if (toRead > this.rem) {
-            toRead = this.rem;
+        if (len > this.rem) {
+            len = this.rem;
         }
 
         int read;
@@ -66,7 +64,7 @@ class EntryInputStream extends InputStream {
                 throw new IOException("ISO file closed.");
             }
 
-            read = this.fileSystem.readBytes(this.entry, this.pos, b, off, toRead);
+            read = this.fileSystem.readBytes(this.entry, this.pos, b, off, len);
         }
 
         if (read > 0) {

@@ -59,6 +59,10 @@ public abstract class AbstractFileSystem implements FileSystem {
         return getRootEntry().get(path);
     }
 
+    public FileEntry grab(String path) throws IOException {
+        return getRootEntry().grab(path);
+    }
+
     // TODO: close open streams automatically
     public synchronized void close() throws IOException {
         if (isClosed()) {

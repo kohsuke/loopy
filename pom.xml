@@ -10,7 +10,7 @@
 
   <groupId>org.kohsuke.loopy</groupId>
   <artifactId>loopy</artifactId>
-  <version>0.5-SNAPSHOT</version>
+  <version>0.5</version>
 
   <scm>
     <connection>scm:git:git://github.com/kohsuke/loopy.git</connection>
